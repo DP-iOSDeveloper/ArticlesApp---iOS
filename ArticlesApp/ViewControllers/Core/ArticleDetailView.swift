@@ -1,6 +1,8 @@
 import SwiftUI
 import Kingfisher
 
+
+// MARK: - Article Detail View
 struct ArticleDetailView: View {
 
     let article: Article
@@ -13,7 +15,7 @@ struct ArticleDetailView: View {
     private let headerColor = Color(red: 0.11, green: 0.22, blue: 0.29)
     private let bodyBgColor = Color(red: 0.93, green: 0.93, blue: 0.93)
     private let imageHeight: CGFloat = 179
-    private let overlapAmount: CGFloat = 179 / 2 // ✅ CHANGE 1: exact 50/50
+    private let overlapAmount: CGFloat = 179 / 2
 
     var body: some View {
         GeometryReader { geo in
@@ -44,26 +46,21 @@ struct ArticleDetailView: View {
                                 .foregroundStyle(Color.white.opacity(0.7))
                         }
                         .padding(.horizontal, 20)
-                        .padding(.bottom, overlapAmount + 24) // ✅ CHANGE 2
+                        .padding(.bottom, overlapAmount + 24)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         GeometryReader { headerGeo in
                             headerColor
-                                .onAppear {
-                                    headerHeight = headerGeo.size.height
-                                }
-                                .onChange(of: headerGeo.size.height) { _, new in
-                                    headerHeight = new
-                                }
+                                .onAppear { headerHeight = headerGeo.size.height }
+                                .onChange(of: headerGeo.size.height) { _, new in headerHeight = new }
                         }
                     )
 
                     // ── GREY BODY ──
                     VStack(alignment: .leading, spacing: 0) {
 
-                        Spacer()
-                            .frame(height: overlapAmount + 24 + 24) // ✅ CHANGE 3
+                        Spacer().frame(height: overlapAmount + 24 + 24)
 
                         Text(article.bodyText)
                             .font(.system(size: 16))
@@ -72,21 +69,38 @@ struct ArticleDetailView: View {
                             .padding(.horizontal, 20)
                             .padding(.bottom, 24)
 
-                        if let urlString = article.url,
-                           let link = URL(string: urlString) {
+                        if let urlString = article.url, let link = URL(string: urlString) {
                             Link(destination: link) {
                                 HStack {
                                     Text("Read Full Article")
-                                    Image(systemName: "arrow.up.right")
+                                    Spacer()
+                                    Image(systemName: "arrow.up.right.circle.fill")
+                                        .font(.system(size: 18))
                                 }
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundStyle(.white)
-                                .padding()
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 16)
                                 .frame(maxWidth: .infinity)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(AppConstants.Colors.readMoreButton)
+                                    // ✅ Liquid Glass layered button
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .fill(AppConstants.Colors.readMoreButton)
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [Color.white.opacity(0.18), Color.clear],
+                                                    startPoint: .top,
+                                                    endPoint: .bottom
+                                                )
+                                            )
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                                    }
                                 )
+                                .shadow(color: AppConstants.Colors.readMoreButton.opacity(0.45),
+                                        radius: 8, x: 0, y: 4)
                             }
                             .padding(.horizontal, 20)
                             .padding(.bottom, 40)
@@ -94,12 +108,6 @@ struct ArticleDetailView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(bodyBgColor)
-                    .clipShape(UnevenRoundedRectangle(
-                        topLeadingRadius: 0,
-                        bottomLeadingRadius: 0,
-                        bottomTrailingRadius: 0,
-                        topTrailingRadius: 0
-                    ))
                     .offset(y: -28)
                     .padding(.bottom, -28)
                 }
@@ -123,66 +131,99 @@ struct ArticleDetailView: View {
                             .frame(maxWidth: .infinity)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .overlay(
+                                // ✅ Liquid Glass shimmer border
                                 RoundedRectangle(cornerRadius: 16)
                                     .stroke(
-                                        Color(red: 0.11, green: 0.53, blue: 0.89),
+                                        LinearGradient(
+                                            colors: [
+                                                Color.white.opacity(0.6),
+                                                Color(red: 0.11, green: 0.53, blue: 0.89).opacity(0.9),
+                                                Color.white.opacity(0.2)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
                                         lineWidth: 2.5
                                     )
                             )
-                            .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
+                            // ✅ Liquid Glass glow shadow
+                            .shadow(color: Color(red: 0.11, green: 0.53, blue: 0.89).opacity(0.35),
+                                    radius: 12, x: 0, y: 6)
                             .padding(.horizontal, 35)
-                            .padding(.top, headerHeight - overlapAmount) // ✅ 50/50 split
+                            .padding(.top, headerHeight - overlapAmount)
                     }
                 }
             }
             .ignoresSafeArea(edges: .top)
             .background(bodyBgColor)
         }
-        .navigationBarHidden(true)
+        // ✅ NATIVE Navigation Bar
+        .navigationTitle("Article")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbarBackground(headerColor, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button { dismiss() } label: {
+                    // ✅ Liquid Glass back button
+                    ZStack {
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 34, height: 34)
+                        Circle()
+                            .fill(LinearGradient(
+                                colors: [Color.white.opacity(0.25), Color.clear],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            ))
+                            .frame(width: 34, height: 34)
+                        Circle()
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                            .frame(width: 34, height: 34)
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { toggleSave() } label: {
+                    // ✅ Liquid Glass heart button
+                    ZStack {
+                        Circle()
+                            .fill(isSaved
+                                  ? AnyShapeStyle(AppConstants.Colors.readMoreButton)
+                                  : AnyShapeStyle(.ultraThinMaterial))
+                            .frame(width: 34, height: 34)
+                        Circle()
+                            .fill(LinearGradient(
+                                colors: [Color.white.opacity(0.2), Color.clear],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            ))
+                            .frame(width: 34, height: 34)
+                        Circle()
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                            .frame(width: 34, height: 34)
+                        Image(systemName: isSaved ? "heart.fill" : "heart")
+                            .font(.system(size: 15))
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
+        }
         .toast(item: $toast)
     }
 
-    // MARK: - TOP BAR
+    // topBar kept for layout reference only (hidden behind nav bar)
     private var topBar: some View {
-        HStack {
-            Button { dismiss() } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.20))
-                        .frame(width: 40, height: 40)
-                    Image(systemName: "arrow.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-            }
-
-            Spacer()
-
-            Text("Article")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.white)
-
-            Spacer()
-
-            Button { toggleSave() } label: {
-                ZStack {
-                    Circle()
-                        .fill(isSaved
-                              ? AppConstants.Colors.readMoreButton
-                              : Color.white.opacity(0.20))
-                        .frame(width: 40, height: 40)
-                    Image(systemName: isSaved ? "heart.fill" : "heart")
-                        .font(.system(size: 17))
-                        .foregroundStyle(.white)
-                }
-            }
-        }
+        // Empty — replaced by native toolbar above
+        // Kept to preserve header spacing logic
+        Color.clear.frame(height: 0)
     }
 
     private func toggleSave() {
-        withAnimation(.spring(response: 0.3)) {
-            isSaved.toggle()
-        }
+        withAnimation(.spring(response: 0.3)) { isSaved.toggle() }
         toast = ToastItem(
             message: isSaved ? "Article saved ✓" : "Article removed",
             style: isSaved ? .success : .info

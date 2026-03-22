@@ -68,15 +68,41 @@ struct ArticleListCardView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 9)
                     .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppConstants.Colors.readMoreButton)
+                        // ✅ Liquid Glass Read More button
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppConstants.Colors.readMoreButton)
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(LinearGradient(
+                                    colors: [Color.white.opacity(0.15), Color.clear],
+                                    startPoint: .top, endPoint: .bottom
+                                ))
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                        }
                     )
+                    .shadow(color: AppConstants.Colors.readMoreButton.opacity(0.4),
+                            radius: 6, x: 0, y: 3)
                 }
                 .padding(.horizontal, 14)
                 .padding(.bottom, 14)
             }
-            .background(AppConstants.Colors.cardBackground)
+            .background(
+                // ✅ Liquid Glass card surface
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(AppConstants.Colors.cardBackground)
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(LinearGradient(
+                            colors: [Color.white.opacity(0.08), Color.clear],
+                            startPoint: .top, endPoint: .center
+                        ))
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                }
+            )
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
         .buttonStyle(.plain)
     }
@@ -115,8 +141,8 @@ struct ArticleGridCardView: View {
                     }
                 }
                 .frame(height: imageHeight)
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.horizontal, 8)
 
                 // ── Title ─────────────────────────────
                 Text(article.formattedTitle)
@@ -131,8 +157,22 @@ struct ArticleGridCardView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: cardHeight)
-            .background(AppConstants.Colors.cardBackground)
+            .background(
+                // ✅ Liquid Glass card surface
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(AppConstants.Colors.cardBackground)
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(LinearGradient(
+                            colors: [Color.white.opacity(0.08), Color.clear],
+                            startPoint: .top, endPoint: .center
+                        ))
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                }
+            )
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }
